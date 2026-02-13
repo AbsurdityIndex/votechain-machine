@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -26,12 +26,23 @@ jobs:
       - name: Go version
         run: go version
 
+      - name: Check gofmt
+        run: |
+          formatted="$(find . -name '*.go' -not -path './.git/*' -print0 | xargs -0 gofmt -l)"
+          if [ -n "$formatted" ]; then
+            echo "Gofmt check failed for:";
+            echo "$formatted";
+            exit 1;
+          fi
+
       - name: Run tests
         run: go test ./...
+
+      - name: Run race tests (short)
+        run: go test -race ./...
 
       - name: Run vet
         run: go vet ./...
 
       - name: Build binaries
         run: go build ./cmd/...
-

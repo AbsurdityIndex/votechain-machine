@@ -41,6 +41,8 @@ Use `scripts/generate-compose-env.sh` to produce production-like credentials for
 - [ ] `go test ./...`
 - [ ] `go vet ./...`
 - [ ] `go build ./cmd/...`
+- [ ] `go test -race ./...`
+- [ ] `gofmt -l $(find . -name '*.go' -not -path './.git/*')` (no output)
 - [ ] Targeted simulation scripts run from the affected area (for orchestration and verification changes).
 - [ ] `docker compose down -v --remove-orphans && docker compose up -d --build` when stack topology changes.
 
@@ -65,4 +67,3 @@ Security/cryptographic changes should include:
 
 Do **not** open public issues for vulnerabilities.
 Use the process in [`SECURITY.md`](./SECURITY.md).
-

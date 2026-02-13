@@ -8,7 +8,7 @@ assignees: []
 
 ## What happened
 
-Describe the issue and expected behavior.
+Describe what failed and what you expected to happen.
 
 ## Steps to reproduce
 
@@ -16,14 +16,23 @@ Describe the issue and expected behavior.
 2. Step two
 3. Step three
 
+## Expected behavior
+
+Describe the expected behavior.
+
 ## Environment
 
 - Runtime/OS:
-- Command / stack used:
+- Go version:
+- DB/version stack:
+- Command / deployment path:
 - Repo hash:
 - Service(s) affected:
+
+## Evidence
+
+Paste logs, minimal repro payloads, or error messages.
 
 ## Security impact
 
 If this issue has security implications, follow [SECURITY.md](../../SECURITY.md) and report privately.
-

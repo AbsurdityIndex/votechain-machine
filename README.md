@@ -275,11 +275,14 @@ Full release build:
 - Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening PRs.
 - Report vulnerabilities privately through [`SECURITY.md`](./SECURITY.md).
 - Use PRs for incremental, reviewable changes with focused scope.
+- For release prep, follow [`RELEASING.md`](./RELEASING.md).
 
 ## Validate
 
 ```bash
 go test ./...
+go test -race ./...
+gofmt -l $(find . -name '*.go' -not -path './.git/*')
 go build ./cmd/votechain-machine
 go build ./cmd/votechain-ingest
 go build ./cmd/votechain-ingest-file

@@ -4,11 +4,13 @@
 - What changed and why?
 - Related issue(s) / PR(s):
 
-## Validation
+## Technical validation
 
 - [ ] `go test ./...`
+- [ ] `go test -race ./...`
 - [ ] `go vet ./...`
 - [ ] `go build ./cmd/...`
+- [ ] `gofmt -l $(find . -name '*.go' -not -path './.git/*')` (no unformatted files)
 - [ ] `docker compose down -v --remove-orphans && docker compose up -d --build` (if deployment changed)
 - [ ] Simulation or smoke verification run (if runtime changed)
 
@@ -16,4 +18,3 @@
 
 - Any protocol, token, DB, or key-management changes?
 - If yes, include protocol review notes and operational impact.
-

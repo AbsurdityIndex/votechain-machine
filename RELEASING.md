@@ -3,9 +3,12 @@
 ## 1) Local release validation
 
 ```bash
+go mod download
 go test ./...
+go test -race ./...
 go vet ./...
 go build ./cmd/...
+gofmt -l $(find . -name '*.go' -not -path './.git/*') | tee /tmp/gofmt.out && [ ! -s /tmp/gofmt.out ]
 
 ./scripts/generate-compose-env.sh .env
 ./scripts/compose-smoke.sh
@@ -33,3 +36,13 @@ Validate generated artifacts are versioned and reproducible.
 - Rotate example compose keys and demo tokens.
 - Verify changelog and incident/hardening docs for any migration notes.
 
+## 5) Runtime change checklist
+
+- Smoke endpoints for machine services:
+  - `/healthz` on each service
+  - `/v1/observer/status`
+  - `/v1/ledger/entries/0` on each ledger role
+
+- If deployment or compose topology changed:
+  - Verify service restart behavior.
+  - Re-run `./scripts/compose-smoke.sh` against a clean compose stack.

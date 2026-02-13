@@ -32,6 +32,7 @@ If you discover a security issue, report it privately. **Do not open a public is
 - Service auth and role/authorization bypasses
 - Secret leakage (tokens, DB credentials, chain keys)
 - Data integrity failures in audit chains and outbox relays
+- Missing or weak threat-model assumptions in consensus-like flows
 
 ## What is out of scope
 
@@ -39,8 +40,16 @@ If you discover a security issue, report it privately. **Do not open a public is
 - Non-security UX complaints in demo-only scripts
 - Dependabot/update noise in CI pipelines unless it changes security posture
 
+## What does not qualify
+
+- Cosmetic issues not affecting integrity or trust boundaries
+- Performance tuning in non-production demo loads unless it impacts safety
+
 ## Disclosure process
 
 We aim to provide a remediation plan within 90 days.
 Where protocol changes are required, we will include rationale in release notes and advisory notes.
 
+## Acknowledgments
+
+Security reporters are credited in release notes and advisories when they opt in.

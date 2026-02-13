@@ -24,3 +24,6 @@ Describe the change in terms of:
 - [ ] Documentation updates
 - [ ] Operational or deployment impact documented
 
+## Related context
+
+- Related PRs, issues, specs, or incident reports:

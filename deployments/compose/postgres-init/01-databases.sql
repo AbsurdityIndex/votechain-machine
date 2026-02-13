@@ -1,0 +1,9 @@
+CREATE DATABASE votechain_machine;
+CREATE DATABASE votechain_machine_2;
+CREATE DATABASE votechain_machine_3;
+CREATE DATABASE votechain_machine_4;
+CREATE DATABASE votechain_machine_5;
+CREATE DATABASE votechain_ingest;
+CREATE DATABASE votechain_federal;
+CREATE DATABASE votechain_state;
+CREATE DATABASE votechain_oversight;

@@ -1,0 +1,39 @@
+storage:
+  postgres_dsn: "postgres://votechain:change-me@127.0.0.1:5432/votechain_ingest?sslmode=disable"
+  max_conns: 10
+  min_conns: 1
+
+security:
+  enforce_secure_transport: false
+
+relay:
+  poll_interval_seconds: 10
+  batch_size: 50
+  required_acks: 2
+  max_backoff_seconds: 600
+
+nodes:
+  - role: "federal"
+    url: "http://127.0.0.1:8301"
+    write_token: "replace-me"
+    ack_key_id: "replace-me"
+    ack_public_key_path: "./keys/federal-node-public.pem"
+    timeout_seconds: 5
+  - role: "state"
+    url: "http://127.0.0.1:8302"
+    write_token: "replace-me"
+    ack_key_id: "replace-me"
+    ack_public_key_path: "./keys/state-node-public.pem"
+    timeout_seconds: 5
+  - role: "oversight"
+    url: "http://127.0.0.1:8303"
+    write_token: "replace-me"
+    ack_key_id: "replace-me"
+    ack_public_key_path: "./keys/oversight-node-public.pem"
+    timeout_seconds: 5
+
+logging:
+  service: "votechain-anchor-relay"
+  version: "0.1.0"
+  commit: "dev"
+  region: "relay"

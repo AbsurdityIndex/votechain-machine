@@ -1,0 +1,17 @@
+/dist
+/keys
+/votechain-machine
+/votechain-ingest
+/votechain-ingest-file
+/votechain-ledger-node
+/votechain-anchor-relay
+/votechain-observer
+/deployments/compose/reports/*.md
+/deployments/compose/reports/*.json
+*.db
+*.log
+.DS_Store
+/.tmp-*
+/.env*
+!.env.example
+/deployments/compose/keys/*.pem

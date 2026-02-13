@@ -1,0 +1,31 @@
+server:
+  listen: "0.0.0.0:8181"
+  read_timeout_seconds: 15
+  write_timeout_seconds: 30
+  shutdown_timeout_seconds: 20
+
+storage:
+  postgres_dsn: "postgres://votechain:${CENTRAL_DB_PASSWORD}@postgres-central:5432/votechain_ingest?sslmode=disable"
+  max_conns: 20
+  min_conns: 2
+
+security:
+  bearer_token: "${INGEST_TOKEN}"
+  enable_bearer_auth: true
+  enable_ip_allow_list: true
+  trusted_cidrs:
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+  max_body_bytes: 67108864
+  require_machine_key_id: true
+  enforce_secure_transport: false
+
+machine_registry:
+  path: "/etc/votechain-ingest/machine-registry.yaml"
+
+logging:
+  service: "votechain-ingest"
+  version: "0.1.0"
+  commit: "compose"
+  region: "central-ingest"

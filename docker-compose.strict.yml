@@ -1,0 +1,53 @@
+services:
+  airgap-ledger-federal:
+    ports: !reset []
+
+  airgap-ledger-state:
+    ports: !reset []
+
+  airgap-ledger-oversight:
+    ports: !reset []
+
+  votechain-machine:
+    ports: !reset []
+
+  votechain-machine-2:
+    ports: !reset []
+
+  votechain-machine-3:
+    ports: !reset []
+
+  votechain-machine-4:
+    ports: !reset []
+
+  votechain-machine-5:
+    ports: !reset []
+
+  votechain-airgap-ingest:
+    ports: !reset []
+
+  votechain-airgap-observer:
+    ports: !reset []
+
+  ledger-federal:
+    ports: !reset []
+
+  ledger-state:
+    ports: !reset []
+
+  ledger-oversight:
+    ports: !reset []
+
+  votechain-ingest:
+    ports: !reset []
+
+  votechain-observer:
+    ports: !reset []
+
+networks:
+  airgap_net:
+    name: votechain_airgap_net
+    internal: true
+  central_net:
+    name: votechain_central_net
+    internal: true

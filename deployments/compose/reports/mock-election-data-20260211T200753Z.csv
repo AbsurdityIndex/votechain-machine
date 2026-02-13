@@ -1,0 +1,11 @@
+session_uid,machine_id,session_index,voter_id,spoiled,selection
+machine-pa-001-s001,machine-pa-001,1,machine-pa-001-voter-001,False,cand_a
+machine-pa-001-s002,machine-pa-001,2,machine-pa-001-voter-002,False,cand_a
+machine-pa-002-s001,machine-pa-002,1,machine-pa-002-voter-001,False,cand_a
+machine-pa-002-s002,machine-pa-002,2,machine-pa-002-voter-002,True,
+machine-pa-003-s001,machine-pa-003,1,machine-pa-003-voter-001,False,cand_a
+machine-pa-003-s002,machine-pa-003,2,machine-pa-003-voter-002,False,cand_a
+machine-pa-004-s001,machine-pa-004,1,machine-pa-004-voter-001,True,
+machine-pa-004-s002,machine-pa-004,2,machine-pa-004-voter-002,False,cand_b
+machine-pa-005-s001,machine-pa-005,1,machine-pa-005-voter-001,True,
+machine-pa-005-s002,machine-pa-005,2,machine-pa-005-voter-002,False,cand_b

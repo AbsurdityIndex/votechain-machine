@@ -1,0 +1,27 @@
+server:
+  listen: "127.0.0.1:8303"
+  read_timeout_seconds: 15
+  write_timeout_seconds: 30
+  shutdown_timeout_seconds: 20
+
+storage:
+  postgres_dsn: "postgres://votechain:change-me@127.0.0.1:5432/votechain_oversight?sslmode=disable"
+  max_conns: 15
+  min_conns: 1
+
+node:
+  role: "oversight"
+
+security:
+  write_token: "replace-me"
+  enforce_secure_transport: false
+
+keys:
+  signing_private_key_path: "./keys/oversight-node-private.pem"
+  signing_public_key_path: "./keys/oversight-node-public.pem"
+
+logging:
+  service: "votechain-ledger-node"
+  version: "0.1.0"
+  commit: "dev"
+  region: "oversight"

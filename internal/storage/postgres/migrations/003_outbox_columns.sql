@@ -1,0 +1,2 @@
+ALTER TABLE anchor_outbox ADD COLUMN IF NOT EXISTS sent_at TIMESTAMPTZ;
+ALTER TABLE anchor_outbox ADD COLUMN IF NOT EXISTS ack_summary JSONB;

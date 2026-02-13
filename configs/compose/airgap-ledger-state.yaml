@@ -1,0 +1,27 @@
+server:
+  listen: "0.0.0.0:8402"
+  read_timeout_seconds: 15
+  write_timeout_seconds: 30
+  shutdown_timeout_seconds: 20
+
+storage:
+  postgres_dsn: "postgres://votechain:${AIRGAP_DB_PASSWORD}@postgres-airgap:5432/votechain_airgap_state?sslmode=disable"
+  max_conns: 15
+  min_conns: 1
+
+node:
+  role: "state"
+
+security:
+  write_token: "${AIRGAP_LEDGER_WRITE_TOKEN}"
+  enforce_secure_transport: false
+
+keys:
+  signing_private_key_path: "/run/keys/state-node-private.pem"
+  signing_public_key_path: "/run/keys/state-node-public.pem"
+
+logging:
+  service: "votechain-ledger-node"
+  version: "0.1.0"
+  commit: "compose"
+  region: "airgap-state"

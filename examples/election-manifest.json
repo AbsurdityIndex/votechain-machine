@@ -1,0 +1,31 @@
+{
+  "manifest": {
+    "election_id": "2026-general-pa",
+    "jurisdiction_id": "pa-philadelphia",
+    "manifest_id": "manifest-2026-general-v1",
+    "not_before": "2026-11-03T11:00:00Z",
+    "not_after": "2026-11-04T03:00:00Z",
+    "receipt_key_id": "ed25519:replace-with-machine-key-id",
+    "source_bundle_sha256": "replace-with-signed-election-bundle-sha256",
+    "contests": [
+      {
+        "contest_id": "president",
+        "type": "candidate",
+        "title": "President of the United States",
+        "options": [
+          {"id": "cand_a", "label": "Candidate A"},
+          {"id": "cand_b", "label": "Candidate B"}
+        ]
+      },
+      {
+        "contest_id": "prop_1",
+        "type": "referendum",
+        "title": "City Referendum 1",
+        "options": [
+          {"id": "yes", "label": "Yes"},
+          {"id": "no", "label": "No"}
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+server:
+  listen: "127.0.0.1:8282"
+  read_timeout_seconds: 10
+  write_timeout_seconds: 20
+  shutdown_timeout_seconds: 15
+
+storage:
+  postgres_dsn: "postgres://votechain:change-me@127.0.0.1:5432/votechain_ingest?sslmode=disable"
+  max_conns: 8
+  min_conns: 1
+
+machine:
+  url: "http://127.0.0.1:8080"
+  bearer_token: "replace-with-long-random-machine-token"
+  timeout_seconds: 5
+
+ingest:
+  url: "http://127.0.0.1:8181"
+  bearer_token: "replace-me"
+  timeout_seconds: 5
+
+nodes:
+  - role: "federal"
+    url: "http://127.0.0.1:8301"
+    timeout_seconds: 5
+  - role: "state"
+    url: "http://127.0.0.1:8302"
+    timeout_seconds: 5
+  - role: "oversight"
+    url: "http://127.0.0.1:8303"
+    timeout_seconds: 5
+
+security:
+  enforce_secure_transport: false
+
+logging:
+  service: "votechain-observer"
+  version: "0.1.0"
+  commit: "dev"
+  region: "observer"

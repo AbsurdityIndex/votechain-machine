@@ -1,0 +1,39 @@
+storage:
+  postgres_dsn: "postgres://votechain:${AIRGAP_DB_PASSWORD}@postgres-airgap:5432/votechain_airgap_ingest?sslmode=disable"
+  max_conns: 10
+  min_conns: 1
+
+security:
+  enforce_secure_transport: false
+
+relay:
+  poll_interval_seconds: 5
+  batch_size: 50
+  required_acks: 2
+  max_backoff_seconds: 600
+
+nodes:
+  - role: "federal"
+    url: "http://airgap-ledger-federal:8401"
+    write_token: "${AIRGAP_LEDGER_WRITE_TOKEN}"
+    ack_key_id: "ed25519:9d8a7d8ed1dcf6e4"
+    ack_public_key_path: "/run/keys/federal-node-public.pem"
+    timeout_seconds: 5
+  - role: "state"
+    url: "http://airgap-ledger-state:8402"
+    write_token: "${AIRGAP_LEDGER_WRITE_TOKEN}"
+    ack_key_id: "ed25519:662d45254c2ffecf"
+    ack_public_key_path: "/run/keys/state-node-public.pem"
+    timeout_seconds: 5
+  - role: "oversight"
+    url: "http://airgap-ledger-oversight:8403"
+    write_token: "${AIRGAP_LEDGER_WRITE_TOKEN}"
+    ack_key_id: "ed25519:f3d9981568791a5e"
+    ack_public_key_path: "/run/keys/oversight-node-public.pem"
+    timeout_seconds: 5
+
+logging:
+  service: "votechain-anchor-relay"
+  version: "0.1.0"
+  commit: "compose"
+  region: "airgap-relay"

@@ -1,0 +1,40 @@
+server:
+  listen: "0.0.0.0:8382"
+  read_timeout_seconds: 10
+  write_timeout_seconds: 20
+  shutdown_timeout_seconds: 15
+
+storage:
+  postgres_dsn: "postgres://votechain:${AIRGAP_DB_PASSWORD}@postgres-airgap:5432/votechain_airgap_ingest?sslmode=disable"
+  max_conns: 8
+  min_conns: 1
+
+machine:
+  url: "http://votechain-machine:8080"
+  bearer_token: "${MACHINE_API_TOKEN}"
+  timeout_seconds: 5
+
+ingest:
+  url: "http://votechain-airgap-ingest:8182"
+  bearer_token: "${AIRGAP_INGEST_TOKEN}"
+  timeout_seconds: 5
+
+nodes:
+  - role: "federal"
+    url: "http://airgap-ledger-federal:8401"
+    timeout_seconds: 5
+  - role: "state"
+    url: "http://airgap-ledger-state:8402"
+    timeout_seconds: 5
+  - role: "oversight"
+    url: "http://airgap-ledger-oversight:8403"
+    timeout_seconds: 5
+
+security:
+  enforce_secure_transport: false
+
+logging:
+  service: "votechain-observer"
+  version: "0.1.0"
+  commit: "compose"
+  region: "airgap-observer"

@@ -1,0 +1,22 @@
+[Unit]
+Description=VoteChain Polling Place Machine Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=votechain
+Group=votechain
+WorkingDirectory=/var/lib/votechain-machine
+ExecStart=/usr/local/bin/votechain-machine -config /etc/votechain-machine/config.yaml
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/votechain-machine /etc/votechain-machine
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

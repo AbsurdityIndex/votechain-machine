@@ -1,0 +1,44 @@
+server:
+  listen: "0.0.0.0:8080"
+  read_timeout_seconds: 10
+  write_timeout_seconds: 20
+  shutdown_timeout_seconds: 15
+
+storage:
+  postgres_dsn: "postgres://votechain:${AIRGAP_DB_PASSWORD}@postgres-airgap:5432/votechain_machine_5?sslmode=disable"
+  max_conns: 12
+  min_conns: 1
+
+machine:
+  machine_id: "machine-pa-005"
+  precinct_id: "precinct-46"
+  jurisdiction_id: "pa-philadelphia"
+  mode: "air-gapped"
+
+keys:
+  signing_private_key_path: "/run/keys/machine-5-signing-private.pem"
+  signing_public_key_path: "/run/keys/machine-5-signing-public.pem"
+
+election:
+  challenge_ttl_seconds: 120
+
+security:
+  bearer_token: "${MACHINE_API_TOKEN}"
+  enable_bearer_auth: true
+  enable_ip_allow_list: true
+  trusted_cidrs:
+    - "127.0.0.1/32"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+  enforce_air_gap_mode: false
+  enforce_secure_transport: false
+
+sync:
+  export_dir: "/var/lib/votechain-machine/exports"
+
+logging:
+  service: "votechain-machine"
+  version: "0.1.0"
+  commit: "compose"
+  region: "polling-place"

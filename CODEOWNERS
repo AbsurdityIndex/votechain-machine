@@ -1,0 +1,9 @@
+# Default repository ownership
+* @coreysteinwand
+
+# Security-relevant documentation and operational assets
+/docs/ @coreysteinwand
+/scripts/ @coreysteinwand
+/deployments/compose/keys/ @coreysteinwand
+/deployments/compose/exports/ @coreysteinwand
+

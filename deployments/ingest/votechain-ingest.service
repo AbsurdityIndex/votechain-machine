@@ -1,0 +1,22 @@
+[Unit]
+Description=VoteChain Central Ingest Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=votechain
+Group=votechain
+WorkingDirectory=/var/lib/votechain-ingest
+ExecStart=/usr/local/bin/votechain-ingest -config /etc/votechain-ingest/config.yaml
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/votechain-ingest /etc/votechain-ingest
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

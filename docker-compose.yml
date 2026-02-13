@@ -1,0 +1,590 @@
+x-votechain-env: &votechain_env
+  AIRGAP_DB_PASSWORD: ${AIRGAP_DB_PASSWORD:?set AIRGAP_DB_PASSWORD}
+  CENTRAL_DB_PASSWORD: ${CENTRAL_DB_PASSWORD:?set CENTRAL_DB_PASSWORD}
+  MACHINE_API_TOKEN: ${MACHINE_API_TOKEN:?set MACHINE_API_TOKEN}
+  INGEST_TOKEN: ${INGEST_TOKEN:?set INGEST_TOKEN}
+  AIRGAP_INGEST_TOKEN: ${AIRGAP_INGEST_TOKEN:?set AIRGAP_INGEST_TOKEN}
+  LEDGER_WRITE_TOKEN: ${LEDGER_WRITE_TOKEN:?set LEDGER_WRITE_TOKEN}
+  AIRGAP_LEDGER_WRITE_TOKEN: ${AIRGAP_LEDGER_WRITE_TOKEN:?set AIRGAP_LEDGER_WRITE_TOKEN}
+
+services:
+  postgres-airgap:
+    image: postgres:16-alpine
+    container_name: votechain-postgres-airgap
+    restart: unless-stopped
+    environment:
+      <<: *votechain_env
+      POSTGRES_USER: votechain
+      POSTGRES_PASSWORD: ${AIRGAP_DB_PASSWORD:?set AIRGAP_DB_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_airgap_data:/var/lib/postgresql/data
+      - ./deployments/compose/postgres-init-airgap:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U votechain -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - airgap_net
+
+  postgres-central:
+    image: postgres:16-alpine
+    container_name: votechain-postgres-central
+    restart: unless-stopped
+    environment:
+      <<: *votechain_env
+      POSTGRES_USER: votechain
+      POSTGRES_PASSWORD: ${CENTRAL_DB_PASSWORD:?set CENTRAL_DB_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_central_data:/var/lib/postgresql/data
+      - ./deployments/compose/postgres-init-central:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U votechain -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - central_net
+
+  airgap-ledger-federal:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-airgap-ledger-federal
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-ledger-federal.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8401:8401"
+
+  airgap-ledger-state:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-airgap-ledger-state
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-ledger-state.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8402:8402"
+
+  airgap-ledger-oversight:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-airgap-ledger-oversight
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-ledger-oversight.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8403:8403"
+
+  votechain-machine:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-machine
+    container_name: votechain-machine
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-machine/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/polling-place.yaml:/etc/votechain-machine/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+      - ./deployments/compose/exports:/var/lib/votechain-machine/exports
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8080:8080"
+
+  votechain-machine-2:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-machine
+    container_name: votechain-machine-2
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-machine/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/polling-place-2.yaml:/etc/votechain-machine/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+      - ./deployments/compose/exports/machine-2:/var/lib/votechain-machine/exports
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8081:8080"
+
+  votechain-machine-3:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-machine
+    container_name: votechain-machine-3
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-machine/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/polling-place-3.yaml:/etc/votechain-machine/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+      - ./deployments/compose/exports/machine-3:/var/lib/votechain-machine/exports
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8082:8080"
+
+  votechain-machine-4:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-machine
+    container_name: votechain-machine-4
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-machine/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/polling-place-4.yaml:/etc/votechain-machine/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+      - ./deployments/compose/exports/machine-4:/var/lib/votechain-machine/exports
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8083:8080"
+
+  votechain-machine-5:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-machine
+    container_name: votechain-machine-5
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-machine/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/polling-place-5.yaml:/etc/votechain-machine/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+      - ./deployments/compose/exports/machine-5:/var/lib/votechain-machine/exports
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+    networks:
+      - airgap_net
+    ports:
+      - "8084:8080"
+
+  votechain-airgap-ingest:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ingest
+    container_name: votechain-airgap-ingest
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ingest/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-ingest.yaml:/etc/votechain-ingest/config.yaml:ro
+      - ./configs/compose/machine-registry.yaml:/etc/votechain-ingest/machine-registry.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+      airgap-ledger-federal:
+        condition: service_started
+      airgap-ledger-state:
+        condition: service_started
+      airgap-ledger-oversight:
+        condition: service_started
+    networks:
+      - airgap_net
+    ports:
+      - "8182:8182"
+
+  votechain-airgap-anchor-relay:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-anchor-relay
+    container_name: votechain-airgap-anchor-relay
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-relay/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-relay.yaml:/etc/votechain-relay/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+      votechain-airgap-ingest:
+        condition: service_started
+      airgap-ledger-federal:
+        condition: service_started
+      airgap-ledger-state:
+        condition: service_started
+      airgap-ledger-oversight:
+        condition: service_started
+    networks:
+      - airgap_net
+
+  votechain-airgap-observer:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-observer
+    container_name: votechain-airgap-observer
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-observer/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/airgap-observer.yaml:/etc/votechain-observer/config.yaml:ro
+    depends_on:
+      postgres-airgap:
+        condition: service_healthy
+      votechain-machine:
+        condition: service_started
+      votechain-machine-2:
+        condition: service_started
+      votechain-machine-3:
+        condition: service_started
+      votechain-machine-4:
+        condition: service_started
+      votechain-machine-5:
+        condition: service_started
+      votechain-airgap-ingest:
+        condition: service_started
+      airgap-ledger-federal:
+        condition: service_started
+      airgap-ledger-state:
+        condition: service_started
+      airgap-ledger-oversight:
+        condition: service_started
+    networks:
+      - airgap_net
+    ports:
+      - "8382:8382"
+
+  ledger-federal:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-ledger-federal
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/ledger-federal.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+    networks:
+      - central_net
+    ports:
+      - "8301:8301"
+
+  ledger-state:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-ledger-state
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/ledger-state.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+    networks:
+      - central_net
+    ports:
+      - "8302:8302"
+
+  ledger-oversight:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ledger-node
+    container_name: votechain-ledger-oversight
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ledger/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/ledger-oversight.yaml:/etc/votechain-ledger/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+    networks:
+      - central_net
+    ports:
+      - "8303:8303"
+
+  votechain-ingest:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-ingest
+    container_name: votechain-ingest
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-ingest/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/ingest.yaml:/etc/votechain-ingest/config.yaml:ro
+      - ./configs/compose/machine-registry.yaml:/etc/votechain-ingest/machine-registry.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+      ledger-federal:
+        condition: service_started
+      ledger-state:
+        condition: service_started
+      ledger-oversight:
+        condition: service_started
+    networks:
+      - central_net
+    ports:
+      - "8181:8181"
+
+  votechain-anchor-relay:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-anchor-relay
+    container_name: votechain-anchor-relay
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-relay/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/relay.yaml:/etc/votechain-relay/config.yaml:ro
+      - ./deployments/compose/keys:/run/keys:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+      votechain-ingest:
+        condition: service_started
+      ledger-federal:
+        condition: service_started
+      ledger-state:
+        condition: service_started
+      ledger-oversight:
+        condition: service_started
+    networks:
+      - central_net
+
+  votechain-observer:
+    build:
+      context: .
+      dockerfile: deployments/compose/Dockerfile
+      args:
+        CMD: votechain-observer
+    container_name: votechain-observer
+    restart: unless-stopped
+    environment: *votechain_env
+    command: ["-config", "/etc/votechain-observer/config.yaml"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ./configs/compose/observer.yaml:/etc/votechain-observer/config.yaml:ro
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+      votechain-ingest:
+        condition: service_started
+      ledger-federal:
+        condition: service_started
+      ledger-state:
+        condition: service_started
+      ledger-oversight:
+        condition: service_started
+    networks:
+      - central_net
+    ports:
+      - "8282:8282"
+
+networks:
+  airgap_net:
+    name: votechain_airgap_net
+  central_net:
+    name: votechain_central_net
+
+volumes:
+  postgres_airgap_data:
+  postgres_central_data:

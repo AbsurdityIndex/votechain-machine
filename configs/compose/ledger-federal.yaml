@@ -1,0 +1,27 @@
+server:
+  listen: "0.0.0.0:8301"
+  read_timeout_seconds: 15
+  write_timeout_seconds: 30
+  shutdown_timeout_seconds: 20
+
+storage:
+  postgres_dsn: "postgres://votechain:${CENTRAL_DB_PASSWORD}@postgres-central:5432/votechain_federal?sslmode=disable"
+  max_conns: 15
+  min_conns: 1
+
+node:
+  role: "federal"
+
+security:
+  write_token: "${LEDGER_WRITE_TOKEN}"
+  enforce_secure_transport: false
+
+keys:
+  signing_private_key_path: "/run/keys/federal-node-private.pem"
+  signing_public_key_path: "/run/keys/federal-node-public.pem"
+
+logging:
+  service: "votechain-ledger-node"
+  version: "0.1.0"
+  commit: "compose"
+  region: "federal"

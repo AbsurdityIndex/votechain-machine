@@ -1,0 +1,6 @@
+machines:
+  - machine_id: "machine-pa-001"
+    precinct_id: "precinct-42"
+    jurisdiction_id: "pa-philadelphia"
+    key_id: "ed25519:replace-with-key-id"
+    public_key_path: "./keys/machine-pa-001-public.pem"

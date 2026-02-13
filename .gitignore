@@ -8,6 +8,10 @@
 /votechain-observer
 /deployments/compose/reports/*.md
 /deployments/compose/reports/*.json
+/deployments/compose/reports/*.csv
+/deployments/compose/exports/*.json
+/scripts/__pycache__/
+/deployments/compose/exports
 *.db
 *.log
 .DS_Store
